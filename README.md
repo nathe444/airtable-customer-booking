@@ -18,9 +18,10 @@ _A simple and intuitive tool to collect customer booking requests, store them in
    ![Confirmation Email](confirmationEmail.png)
 
 4. **Workflow orchestration**  
-   The entire process—from form submission to email dispatch—is managed via an automation workflow (e.g., using Zapier, n8n, or serverless functions).  
+   The entire process—from form submission to email dispatch—is managed via N8N automation workflow.  
    ![Workflow Diagram](workflow.png)
 
 ---
+
 
 
