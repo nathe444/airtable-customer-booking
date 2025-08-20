@@ -1,4 +1,3 @@
-﻿# airtable-customer-booking
 # Airtable Customer Booking
 
 _A simple and intuitive tool to collect customer booking requests, store them in Airtable, and send confirmation emails._
@@ -22,6 +21,7 @@ _A simple and intuitive tool to collect customer booking requests, store them in
    ![Workflow Diagram](workflow.png)
 
 ---
+
 
 
 
