@@ -1,0 +1,372 @@
+{
+  "name": "airtable customer",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "authentication": "airtableTokenApi",
+        "baseId": {
+          "__rl": true,
+          "value": "https://airtable.com/app65dnEDW6Su9sb5/tbldeXQJdEuUqGy38/viwTTHAAFN4X3wc3n",
+          "mode": "url"
+        },
+        "tableId": {
+          "__rl": true,
+          "value": "https://airtable.com/app65dnEDW6Su9sb5/tbldeXQJdEuUqGy38/viwTTHAAFN4X3wc3n",
+          "mode": "url"
+        },
+        "triggerField": "created_at",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.airtableTrigger",
+      "typeVersion": 1,
+      "position": [
+        -16,
+        16
+      ],
+      "id": "e602232e-4c01-4149-86ce-c0b9be038e94",
+      "name": "Airtable Trigger",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "FinUlB3tPLP6eIdU",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are responsible for customer orders. Your task is to collect incoming information about new orders and create a clear summary that will be sent via email to the team. The email should be signed with \"Customer Success Team\".\n\nHere are the details of the customer orders:\nOrder Number: {{ $json.fields['Order Number'] }}\nCustomer: {{ $json.fields.Customer }}\nProduct: {{ $json.fields.Product }}\nQuantity: {{ $json.fields.Quantity }}\nPrice: {{ $json.fields.Price }}\nDate: {{ $json.fields.Date }}\nStatus: {{ $json.fields.Status }}\nPlease provide the following output parameters:\nemail_subject\nemail_body\n\nmake a clean body , subject and also trim unecessary words ,  with new lines if needed . also dont include the texts such as here are the output parameters and keys like **email_subject:** and **email_body:**",
+        "messages": {
+          "messageValues": [
+            {
+              "message": "=You are responsible for customer orders. Your task is to collect incoming information about new orders and create a clear summary that will be sent via email to the team. The email should be signed with \"Customer Success Team\".\n\nHere are the details of the customer orders:\nOrder Number: {{ $json.fields['Order Number'] }}\nCustomer: {{ $json.fields.Customer }}\nProduct: {{ $json.fields.Product }}\nQuantity: {{ $json.fields.Quantity }}\nPrice: {{ $json.fields.Price }}\nDate: {{ $json.fields.Date }}\nStatus: {{ $json.fields.Status }}\nPlease provide the following output parameters:\nemail_subject\nemail_body\nmake a clean body with new lines if needed"
+            }
+          ]
+        },
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.7,
+      "position": [
+        272,
+        -16
+      ],
+      "id": "a85f6904-4e48-4a27-81e9-8a059e1f7b86",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        96,
+        176
+      ],
+      "id": "cc223116-9972-4c17-820d-6fb2a738443e",
+      "name": "Groq Chat Model",
+      "credentials": {
+        "groqApi": {
+          "id": "TCa7ZPZq5vcL2Ba9",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "natnaelmulugeta1738@gmail.com",
+        "subject": "Order Success",
+        "emailType": "text",
+        "message": "={{ $json.text }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        288,
+        256
+      ],
+      "id": "5515183d-ec27-453c-9aba-5dd196f9a0f7",
+      "name": "Send a message",
+      "webhookId": "8c666f68-68bb-4387-a860-ede5456d5837",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "5P5Bri7JoOsB2VRs",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "formTitle": "Orders",
+        "formDescription": "Enter the detail of the product you want to order",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Name",
+              "placeholder": "enter your name",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Product",
+              "placeholder": "enter the product name",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Quantity",
+              "fieldType": "number",
+              "placeholder": "enter the quantity",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Price",
+              "fieldType": "number",
+              "placeholder": "enter the price",
+              "requiredField": true
+            },
+            {
+              "fieldType": "hiddenField",
+              "fieldName": "created_at",
+              "fieldValue": "={{ new Date().toISOString() }}"
+            },
+            {
+              "fieldLabel": "Order Number"
+            },
+            {
+              "fieldLabel": "Date",
+              "fieldType": "date"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.2,
+      "position": [
+        -128,
+        176
+      ],
+      "id": "21e509b0-ae2c-4c8c-853f-bcae8963c3a6",
+      "name": "On form submission",
+      "webhookId": "4e8f69d4-3922-4e1e-bf09-c7183aad0531"
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "base": {
+          "__rl": true,
+          "value": "app65dnEDW6Su9sb5",
+          "mode": "list",
+          "cachedResultName": "orders",
+          "cachedResultUrl": "https://airtable.com/app65dnEDW6Su9sb5"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tbldeXQJdEuUqGy38",
+          "mode": "list",
+          "cachedResultName": "Table 1",
+          "cachedResultUrl": "https://airtable.com/app65dnEDW6Su9sb5/tbldeXQJdEuUqGy38"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Quantity": "={{ $json.Quantity }}",
+            "Price": "={{ $json.Price }}",
+            "Order Number": "={{ $json['Order Number'] }}",
+            "Customer": "={{ $json.Name }}",
+            "Product": "={{ $json.Product }}",
+            "Date": "={{ $json.submittedAt }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Order Number",
+              "displayName": "Order Number",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Customer",
+              "displayName": "Customer",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Product",
+              "displayName": "Product",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Quantity",
+              "displayName": "Quantity",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Price",
+              "displayName": "Price",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "dateTime",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Completed",
+                  "value": "Completed"
+                },
+                {
+                  "name": "Pending",
+                  "value": "Pending"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "created_at",
+              "displayName": "created_at",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {
+          "typecast": true
+        }
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        -272,
+        0
+      ],
+      "id": "514d8577-4243-4e89-9698-26770bc0b62a",
+      "name": "Create a record",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "FinUlB3tPLP6eIdU",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Airtable Trigger": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Create a record",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "30997bad-d8e2-4882-b324-a732a7a91f67",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "930086f32ad74ac33e48aaedc8fe53d5ee06f4b06ad339c7d55055acfa97b8ac"
+  },
+  "id": "CdnjZysutszS1j4t",
+  "tags": []
+}
